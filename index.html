@@ -5,40 +5,137 @@
 <title>Edgar ❤️ Kamry</title>
 
 <style>
-body {
+body{
   margin:0;
   height:100vh;
+  overflow:hidden;
   display:flex;
   justify-content:center;
   align-items:center;
+  font-family:Segoe UI, cursive;
   background:linear-gradient(135deg,#0a1f44,#163d7a,#1f5fbf);
-  font-family:Segoe UI;
   color:white;
+  text-align:center;
 }
 
+/* card */
 .card{
   background:rgba(255,255,255,0.12);
   padding:40px;
-  border-radius:20px;
+  border-radius:25px;
   width:90%;
-  max-width:500px;
-  text-align:center;
+  max-width:520px;
+  backdrop-filter:blur(10px);
 }
 
 h1{
   font-size:2.2rem;
+  margin-bottom:10px;
+}
+
+.names{
+  color:#7ec8ff;
+  margin-bottom:20px;
+}
+
+button{
+  padding:12px 26px;
+  margin:8px;
+  border:none;
+  border-radius:25px;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+#yes{
+  background:#4fc3f7;
+  color:white;
+}
+
+#no{
+  background:white;
+  color:#333;
+  position:relative;
+}
+
+#message{
+  margin-top:18px;
+  opacity:0;
+  font-size:1.3rem;
+  transition:.4s;
+}
+
+/* floating emojis */
+.float{
+  position:absolute;
+  animation:floatUp 6s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes floatUp{
+  from{transform:translateY(110vh);opacity:0;}
+  20%{opacity:1;}
+  to{transform:translateY(-10vh);opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
+<audio id="music" src="dandelions.mp3" loop></audio>
+
 <div class="card">
   <h1>Will You Be My Valentine?</h1>
-  <p>Edgar ❤️ Kamry</p>
+  <div class="names">Edgar ❤️ Kamry</div>
+
+  <button id="yes">Yes 💙</button>
+  <button id="no">No</button>
+
+  <div id="message">Yay!! I love you forever 💙</div>
 </div>
+
+<script>
+const yes=document.getElementById("yes");
+const no=document.getElementById("no");
+const msg=document.getElementById("message");
+const music=document.getElementById("music");
+
+/* yes */
+yes.onclick=(e)=>{
+  music.play();
+  msg.style.opacity=1;
+
+  for(let i=0;i<25;i++){
+    const h=document.createElement("div");
+    h.innerHTML="💙";
+    h.style.position="absolute";
+    h.style.left=e.clientX+"px";
+    h.style.top=e.clientY+"px";
+    h.style.fontSize="22px";
+    h.style.transform=`translate(${(Math.random()-0.5)*300}px, ${(Math.random()-0.5)*300}px)`;
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),800);
+  }
+};
+
+/* no runs away */
+no.onmouseover=()=>{
+  no.style.position="absolute";
+  no.style.left=Math.random()*(window.innerWidth-80)+"px";
+  no.style.top=Math.random()*(window.innerHeight-40)+"px";
+};
+
+/* floating butterflies + flowers */
+setInterval(()=>{
+  const e=document.createElement("div");
+  e.className="float";
+  e.innerHTML=Math.random()>0.5?"🦋":"✿";
+  e.style.left=Math.random()*100+"vw";
+  e.style.fontSize="20px";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),6000);
+},600);
+</script>
 
 </body>
 </html>
-
-
