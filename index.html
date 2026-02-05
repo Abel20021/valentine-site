@@ -100,7 +100,7 @@ const no = document.getElementById("no");
 const msg = document.getElementById("message");
 const music = document.getElementById("music");
 
-/* YES button */
+/* ---------------- YES BUTTON ---------------- */
 yes.onclick = (e) => {
   music.play();
   msg.style.opacity = 1;
@@ -118,38 +118,77 @@ yes.onclick = (e) => {
   }
 };
 
-/* NO button chase behavior */
-let posX = window.innerWidth/2;
-let posY = window.innerHeight/2;
+
+/* ---------------- CHASEABLE NO BUTTON ---------------- */
+
+let mouseX = 0;
+let mouseY = 0;
+
+let x = window.innerWidth / 2;
+let y = window.innerHeight / 2;
+
+let vx = 0;
+let vy = 0;
+
+const maxSpeed = 6;     // top speed
+const accel = 0.35;     // how strongly it runs away
 
 no.style.position = "absolute";
-no.style.left = posX + "px";
-no.style.top = posY + "px";
-no.style.transition = "left 0.25s ease, top 0.25s ease";
 
-document.addEventListener("mousemove", (e) => {
-  const rect = no.getBoundingClientRect();
-
-  const dx = e.clientX - (rect.left + rect.width/2);
-  const dy = e.clientY - (rect.top + rect.height/2);
-
-  const distance = Math.sqrt(dx*dx + dy*dy);
-
-  /* only run if cursor gets close */
-  if(distance < 140){
-    posX -= dx * 0.6;
-    posY -= dy * 0.6;
-
-    /* keep inside screen */
-    posX = Math.max(0, Math.min(window.innerWidth - rect.width, posX));
-    posY = Math.max(0, Math.min(window.innerHeight - rect.height, posY));
-
-    no.style.left = posX + "px";
-    no.style.top = posY + "px";
-  }
+document.addEventListener("mousemove", e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
 });
 
-/* floating emojis */
+function animate(){
+  const rect = no.getBoundingClientRect();
+
+  const cx = x + rect.width/2;
+  const cy = y + rect.height/2;
+
+  const dx = cx - mouseX;
+  const dy = cy - mouseY;
+
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  /* run away only when close */
+  if(dist < 250){
+    vx += (dx/dist) * accel;
+    vy += (dy/dist) * accel;
+  }
+
+  /* limit speed */
+  vx *= 0.96;
+  vy *= 0.96;
+
+  vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
+  vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
+
+  x += vx;
+  y += vy;
+
+  /* bounce off edges */
+  if(x <= 0 || x >= window.innerWidth - rect.width){
+    vx *= -1;
+  }
+  if(y <= 0 || y >= window.innerHeight - rect.height){
+    vy *= -1;
+  }
+
+  /* clamp inside */
+  x = Math.max(0, Math.min(window.innerWidth - rect.width, x));
+  y = Math.max(0, Math.min(window.innerHeight - rect.height, y));
+
+  no.style.left = x + "px";
+  no.style.top = y + "px";
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+
+/* ---------------- FLOATING EMOJIS ---------------- */
 setInterval(()=>{
   const e=document.createElement("div");
   e.className="float";
