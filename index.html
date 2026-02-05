@@ -114,14 +114,14 @@ let x = window.innerWidth / 2;
 let y = window.innerHeight / 2;
 
 no.style.position = "fixed";
-no.style.left = x + "px";
-no.style.top  = y + "px";
-no.style.transition = "left 0.02s linear, top 0.02s linear"; // smooth movement
 
 document.addEventListener("mousemove", e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
+});
 
+// animation loop for smooth movement
+function chase() {
   const rect = no.getBoundingClientRect();
   const cx = x + rect.width / 2;
   const cy = y + rect.height / 2;
@@ -131,13 +131,25 @@ document.addEventListener("mousemove", e => {
 
   const dist = Math.sqrt(dx*dx + dy*dy);
 
-  if(dist < 300){ // only react when close
+  if(dist > 0 && dist < 300){ // only move if cursor is close
     // speed increases as you get closer
-    const maxSpeed = 12; 
-    const speed = ((300 - dist) / 300) * maxSpeed; 
+    const maxSpeed = 12;
+    const speed = ((300 - dist) / 300) * maxSpeed;
 
+    // move away from cursor
     x += (dx / dist) * speed;
     y += (dy / dist) * speed;
 
-    // clamp to screen
-    x = Math.max(0, Math.mi
+    // clamp inside window
+    x = Math.max(0, Math.min(window.innerWidth - rect.width, x));
+    y = Math.max(0, Math.min(window.innerHeight - rect.height, y));
+
+    no.style.left = x + "px";
+    no.style.top  = y + "px";
+  }
+
+  requestAnimationFrame(chase);
+}
+
+chase();
+</script>
