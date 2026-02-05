@@ -100,27 +100,26 @@ const no  = document.getElementById("no");
 const msg = document.getElementById("message");
 const music = document.getElementById("music");
 
-/* YES BUTTON */
+/* ---------------- YES BUTTON ---------------- */
 yes.onclick = () => {
   music.play();
   msg.style.opacity = 1;
 };
 
-/* ACCELERATING CHASE NO BUTTON */
+/* ---------------- SMOOTH ACCELERATING CHASE ---------------- */
 let mouseX = 0;
 let mouseY = 0;
 
 let x = window.innerWidth / 2;
 let y = window.innerHeight / 2;
 
-no.style.position = "fixed";
+no.style.position = "fixed"; // stays inside viewport
 
 document.addEventListener("mousemove", e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
 });
 
-// animation loop for smooth movement
 function chase() {
   const rect = no.getBoundingClientRect();
   const cx = x + rect.width / 2;
@@ -128,15 +127,14 @@ function chase() {
 
   const dx = cx - mouseX;
   const dy = cy - mouseY;
-
   const dist = Math.sqrt(dx*dx + dy*dy);
 
-  if(dist > 0 && dist < 300){ // only move if cursor is close
-    // speed increases as you get closer
-    const maxSpeed = 12;
+  if(dist > 0 && dist < 300){ 
+    // speed proportional to closeness
+    const maxSpeed = 10; // max runaway speed
     const speed = ((300 - dist) / 300) * maxSpeed;
 
-    // move away from cursor
+    // smooth movement
     x += (dx / dist) * speed;
     y += (dy / dist) * speed;
 
