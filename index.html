@@ -154,7 +154,7 @@ yes.onclick = () => {
   msg.style.opacity = 1;
 };
 
-/* ---------------- FAST BOUNCING NO BUTTON ---------------- */
+/* ---------------- CONDITIONAL BOUNCING NO BUTTON ---------------- */
 let mouseX = 0;
 let mouseY = 0;
 
@@ -162,58 +162,76 @@ let mouseY = 0;
 let x = window.innerWidth / 2;
 let y = window.innerHeight / 2;
 
-// Initial velocity
-let vx = 6 + Math.random()*4; // random initial speed X
-let vy = 6 + Math.random()*4; // random initial speed Y
+// Initial velocity (will start moving when activated)
+let vx = 0;
+let vy = 0;
 
-// Maximum speed
+// Max speed
 const maxSpeed = 15;
+
+// Activation flag
+let activated = false;
 
 // Listen to mouse
 document.addEventListener("mousemove", e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
+
+  // Activate if cursor is close
+  const rect = no.getBoundingClientRect();
+  const cx = x + rect.width / 2;
+  const cy = y + rect.height / 2;
+  const dx = cx - mouseX;
+  const dy = cy - mouseY;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  if(dist < 200 && !activated){
+    activated = true;
+    // give it a random initial velocity to start bouncing
+    vx = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random()*4);
+    vy = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random()*4);
+  }
 });
 
 no.style.position = "fixed";
 
 function gameLoop() {
-  const rect = no.getBoundingClientRect();
-  const width = rect.width;
-  const height = rect.height;
+  if(activated){
+    const rect = no.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
 
-  // Calculate center
-  const cx = x + width/2;
-  const cy = y + height/2;
+    // Slight acceleration away from cursor if close
+    const cx = x + width/2;
+    const cy = y + height/2;
+    const dx = cx - mouseX;
+    const dy = cy - mouseY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
 
-  // Accelerate slightly away from mouse if close
-  const dx = cx - mouseX;
-  const dy = cy - mouseY;
-  const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist < 200 && dist > 0){
+      const factor = (200 - dist)/200; // closer → bigger push
+      vx += (dx/dist) * factor * 0.5;
+      vy += (dy/dist) * factor * 0.5;
+    }
 
-  if(dist < 200 && dist > 0){
-    const factor = (200 - dist)/200; // closer → bigger push
-    vx += (dx/dist) * factor * 0.5;
-    vy += (dy/dist) * factor * 0.5;
+    // Limit speed
+    vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
+    vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
+
+    // Move button
+    x += vx;
+    y += vy;
+
+    // Bounce off edges
+    if(x <= 0) { x = 0; vx *= -1; }
+    if(x >= window.innerWidth - width) { x = window.innerWidth - width; vx *= -1; }
+    if(y <= 0) { y = 0; vy *= -1; }
+    if(y >= window.innerHeight - height) { y = window.innerHeight - height; vy *= -1; }
+
+    // Apply position
+    no.style.left = x + "px";
+    no.style.top  = y + "px";
   }
-
-  // Limit speed
-  vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
-  vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
-
-  // Move button
-  x += vx;
-  y += vy;
-
-  // Bounce off edges
-  if(x <= 0) { x = 0; vx *= -1; }
-  if(x >= window.innerWidth - width) { x = window.innerWidth - width; vx *= -1; }
-  if(y <= 0) { y = 0; vy *= -1; }
-  if(y >= window.innerHeight - height) { y = window.innerHeight - height; vy *= -1; }
-
-  // Apply position
-  no.style.left = x + "px";
-  no.style.top  = y + "px";
 
   requestAnimationFrame(gameLoop);
 }
@@ -221,7 +239,6 @@ function gameLoop() {
 gameLoop();
 </script>
 
-<script>
 /* ---------------- BLUE BUTTERFLIES ---------------- */
 setInterval(() => {
   const b = document.createElement("div");
