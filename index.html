@@ -18,8 +18,21 @@ body{
   text-align:center;
 }
 
+/* background container */
+#background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none; /* allows clicks through */
+}
+
 /* card */
 .card{
+  position: relative;
+  z-index: 10; /* above background */
   background:rgba(255,255,255,0.12);
   padding:40px;
   border-radius:25px;
@@ -77,77 +90,10 @@ button{
   20%{opacity:1;}
   to{transform:translateY(-10vh);opacity:0;}
 }
-</style>
-</head>
 
-<body>
-
-<audio id="music" src="dandelions.mp3" loop></audio>
-
-<div class="card">
-  <h1>Will You Be My Valentine?</h1>
-  <div class="names">Edgar ❤️ Kamry</div>
-
-  <button id="yes">Yes 💙</button>
-  <button id="no">No</button>
-
-  <div id="message">Yay!! I love you forever 💙</div>
-</div>
-
-<script>
-const yes = document.getElementById("yes");
-const no  = document.getElementById("no");
-const msg = document.getElementById("message");
-const music = document.getElementById("music");
-
-/* ---------------- YES BUTTON ---------------- */
-yes.onclick = () => {
-  music.play();
-  msg.style.opacity = 1;
-};
-
-/* ---------------- SMOOTH ACCELERATING CHASE ---------------- */
-let mouseX = 0;
-let mouseY = 0;
-
-let x = window.innerWidth / 2;
-let y = window.innerHeight / 2;
-
-no.style.position = "fixed"; // stays inside viewport
-
-document.addEventListener("mousemove", e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
-
-function chase() {
-  const rect = no.getBoundingClientRect();
-  const cx = x + rect.width / 2;
-  const cy = y + rect.height / 2;
-
-  const dx = cx - mouseX;
-  const dy = cy - mouseY;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-
-  if(dist > 0 && dist < 300){ 
-    // speed proportional to closeness
-    const maxSpeed = 10; // max runaway speed
-    const speed = ((300 - dist) / 300) * maxSpeed;
-
-    // smooth movement
-    x += (dx / dist) * speed;
-    y += (dy / dist) * speed;
-
-    // clamp inside window
-    x = Math.max(0, Math.min(window.innerWidth - rect.width, x));
-    y = Math.max(0, Math.min(window.innerHeight - rect.height, y));
-
-    no.style.left = x + "px";
-    no.style.top  = y + "px";
-  }
-
-  requestAnimationFrame(chase);
-}
-
-chase();
-</script>
+/* butterflies */
+.butterfly {
+  position: absolute;
+  font-size: 20px;
+  color: #4fc3f7; /* blue butterflies */
+  opacity: 0.8;
